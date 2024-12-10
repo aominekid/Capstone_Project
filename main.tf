@@ -7,49 +7,94 @@ terraform {
   }
 }
 
+# Provider konfigurieren
 provider "aws" {
-  region = "us-west-2"
+  region = "us-west-2"  # Stelle sicher, dass die Region passt
 }
 
-# S3-Bucket erstellen
-resource "aws_s3_bucket" "event_photos" {
-  bucket = "event-photo-gallery-${random_string.suffix.result}"
+# VPC erstellen
+resource "aws_vpc" "vpc_docker" {
+  cidr_block = "10.0.0.0/27"
   tags = {
-    Name = "EventPhotoGallery"
+    Name = "vpc-docker"
   }
 }
 
-# S3-Bucket ACL (statt direkt im Bucket zu setzen)
-resource "aws_s3_bucket_acl" "event_photos_acl" {
-  bucket = aws_s3_bucket.event_photos.id
-  acl    = "public-read"
-}
-
-# S3-Bucket Website Konfiguration
-resource "aws_s3_bucket_website_configuration" "website" {
-  bucket = aws_s3_bucket.event_photos.id
-
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "404.html"
+# Subnetz erstellen
+resource "aws_subnet" "docker_subnet" {
+  vpc_id            = aws_vpc.vpc_docker.id
+  cidr_block        = "10.0.0.0/28"
+  availability_zone = "us-west-2a"
+  tags = {
+    Name = "docker-subnet"
   }
 }
 
-# Zufälliger String für den Bucket-Namen
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
+# Internet-Gateway erstellen
+resource "aws_internet_gateway" "igw_docker" {
+  vpc_id = aws_vpc.vpc_docker.id
+  tags = {
+    Name = "igw-docker"
+  }
 }
 
-# Outputs
-output "bucket_name" {
-  value = aws_s3_bucket.event_photos.bucket
+# Route Table erstellen und Route hinzufügen
+resource "aws_route_table" "rt_docker" {
+  vpc_id = aws_vpc.vpc_docker.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw_docker.id
+  }
+
+  tags = {
+    Name = "docker-route-table"
+  }
 }
 
-output "bucket_website_endpoint" {
-  value = aws_s3_bucket_website_configuration.website.website_endpoint
+# Route Table mit Subnetz verknüpfen
+resource "aws_route_table_association" "rta_docker" {
+  subnet_id      = aws_subnet.docker_subnet.id
+  route_table_id = aws_route_table.rt_docker.id
 }
+
+# Security Group erstellen
+resource "aws_security_group" "docker_sg" {
+  vpc_id = aws_vpc.vpc_docker.id
+  tags = {
+    Name = "docker-sg"
+  }
+
+  # SSH-Zugriff erlauben
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # HTTP-Zugriff erlauben
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Alle ausgehenden Verbindungen erlauben
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# EC2-Instanz erstellen
+resource "aws_instance" "docker_instance" {
+  ami           = "ami-061dd8b45bc7deb3d" # Amazon Linux 2 AMI
+  instance_type = "t2.micro"
+  subnet_id     = aws_subnet.docker_subnet.id
+  vpc_security_group_ids = [aws_security_group.docker_sg.id]
+  key_name      = "vockey"  # Stelle sicher, dass der Key-Pair existiert
+  }
