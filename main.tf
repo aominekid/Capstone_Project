@@ -6,6 +6,7 @@ provider "aws" {
 # S3-Bucket
 resource "aws_s3_bucket" "foto_bucket" {
   bucket = "hochzeits-foto-bucket-unique-eu" # Einzigartiger Bucket-Name
+  acl    = "public-read"
 }
 
 # ACL separat definieren
@@ -69,9 +70,13 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Effect   = "Allow",
         Action   = [
           "s3:PutObject",
-          "s3:GetObject"
+          "s3:GetObject",
+          "s3:GetBucketObjectLockConfiguration" # Objekt Lock Berechtigung
         ],
-        Resource = "arn:aws:s3:::hochzeits-foto-bucket-unique-eu/*"
+        Resource = [
+          "arn:aws:s3:::hochzeits-foto-bucket-unique-eu",
+          "arn:aws:s3:::hochzeits-foto-bucket-unique-eu/*"
+        ]
       }
     ]
   })
