@@ -8,15 +8,17 @@ resource "aws_s3_bucket_policy" "foto_bucket_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid       = "AllowFullAccessForTerraformUser",
+        Sid       = "AllowTerraformUserAccess",
         Effect    = "Allow",
         Principal = {
           AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/terraform-user"
         },
-        Action    = "s3:*",
-        Resource  = [
-          "arn:aws:s3:::hochzeits-foto-bucket-unique-eu",     # Zugriff auf den Bucket
-          "arn:aws:s3:::hochzeits-foto-bucket-unique-eu/*"   # Zugriff auf Inhalte im Bucket
+        Action    = [
+          "s3:*", # Alle Aktionen erlauben, einschließlich GetObjectLockConfiguration
+        ],
+        Resource = [
+          "arn:aws:s3:::hochzeits-foto-bucket",
+          "arn:aws:s3:::hochzeits-foto-bucket/*"
         ]
       }
     ]
