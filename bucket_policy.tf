@@ -1,3 +1,7 @@
+# Datenquelle für AWS-Account-ID
+data "aws_caller_identity" "current" {}
+
+# Bucket-Policy für den S3-Bucket
 resource "aws_s3_bucket_policy" "foto_bucket_policy" {
   bucket = aws_s3_bucket.foto_bucket.id
   policy = jsonencode({
