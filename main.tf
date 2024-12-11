@@ -12,7 +12,6 @@ resource "aws_s3_bucket" "foto_bucket" {
 # ACL separat definieren
 resource "aws_s3_bucket_acl" "foto_bucket_acl" {
   bucket = aws_s3_bucket.foto_bucket.id
-  acl    = "public-read"
 }
 
 # Versionierung separat konfigurieren
@@ -71,7 +70,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Action   = [
           "s3:PutObject",
           "s3:GetObject",
-          "s3:GetBucketObjectLockConfiguration" # Objekt Lock Berechtigung
+          "s3:GetBucketObjectLockConfiguration" # Berechtigung hinzugefügt
         ],
         Resource = [
           "arn:aws:s3:::hochzeits-foto-bucket-unique-eu",
@@ -81,3 +80,4 @@ resource "aws_iam_role_policy" "lambda_policy" {
     ]
   })
 }
+
