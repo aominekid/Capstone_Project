@@ -48,8 +48,8 @@ resource "aws_lambda_function" "upload_lambda" {
   runtime       = "python3.9"
 
   # Code für Lambda
-  filename         = "lambda_function.zip"
-  source_code_hash = filebase64sha256("lambda_function.zip")
+  filename         = "backend/lambda_function.zip"
+  source_code_hash = filebase64sha256("backend/lambda_function.zip")
   environment {
     variables = {
       BUCKET_NAME = aws_s3_bucket.foto_bucket.id
