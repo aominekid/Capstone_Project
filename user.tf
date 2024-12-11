@@ -25,7 +25,7 @@ resource "aws_iam_user_policy" "custom_policy" {
       {
         Effect   = "Allow",
         Action   = [
-          "s3:*",                  # Alle S3-Aktionen
+          "s3:*",                  # Alle S3-Aktionen erlauben
           "iam:CreateRole",        # Erforderlich für Lambda-Rollen
           "iam:AttachRolePolicy",  # Rollen verwalten
           "iam:PassRole"           # Rollen weitergeben

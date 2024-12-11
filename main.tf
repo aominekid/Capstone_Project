@@ -23,23 +23,6 @@ resource "aws_s3_bucket_versioning" "foto_bucket_versioning" {
   }
 }
 
-# Bucket-Policy separat definieren
-resource "aws_s3_bucket_policy" "foto_bucket_policy" {
-  bucket = aws_s3_bucket.foto_bucket.id
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid       = "PublicReadGetObject",
-        Effect    = "Allow",
-        Principal = "*",
-        Action    = "s3:GetObject",
-        Resource  = "arn:aws:s3:::hochzeits-foto-bucket/*"
-      }
-    ]
-  })
-}
-
 # Lambda-Funktion erstellen
 resource "aws_lambda_function" "upload_lambda" {
   function_name = "FotoUploadFunction"
