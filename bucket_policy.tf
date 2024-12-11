@@ -13,13 +13,7 @@ resource "aws_s3_bucket_policy" "foto_bucket_policy" {
         Principal = {
           AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/terraform-user"
         },
-        Action    = [
-          "s3:GetBucketObjectLockConfiguration", # Spezifische Aktion hinzugefügt
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
-        ],
+        Action    = "s3:*",
         Resource  = [
           "arn:aws:s3:::hochzeits-foto-bucket",     # Zugriff auf den Bucket
           "arn:aws:s3:::hochzeits-foto-bucket/*"   # Zugriff auf Inhalte im Bucket

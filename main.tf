@@ -1,6 +1,6 @@
 # Provider konfigurieren
 provider "aws" {
-  region = "eu-central-1" # Region Frankfurt
+  region = "us-west-2" # Region Oregon
 }
 
 # S3-Bucket
@@ -21,6 +21,23 @@ resource "aws_s3_bucket_versioning" "foto_bucket_versioning" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+# Bucket-Policy separat definieren
+resource "aws_s3_bucket_policy" "foto_bucket_policy" {
+  bucket = aws_s3_bucket.foto_bucket.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "PublicReadGetObject",
+        Effect    = "Allow",
+        Principal = "*",
+        Action    = "s3:GetObject",
+        Resource  = "arn:aws:s3:::hochzeits-foto-bucket/*"
+      }
+    ]
+  })
 }
 
 # Lambda-Funktion erstellen
