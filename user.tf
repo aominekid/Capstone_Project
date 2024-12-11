@@ -15,7 +15,7 @@ resource "aws_iam_user_policy_attachment" "admin_access" {
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
-# Optional: Benutzerdefinierte Policy hinzufügen
+# Benutzerdefinierte Policy hinzufügen
 resource "aws_iam_user_policy" "custom_policy" {
   name   = "TerraformCustomPolicy"
   user   = aws_iam_user.terraform_user.name
@@ -25,10 +25,10 @@ resource "aws_iam_user_policy" "custom_policy" {
       {
         Effect   = "Allow",
         Action   = [
-          "iam:CreateRole",
-          "iam:AttachRolePolicy",
-          "iam:PassRole",
-          "s3:*"
+          "s3:*",                  # Alle S3-Aktionen erlauben
+          "iam:CreateRole",        # Erforderlich für Lambda-Rollen
+          "iam:AttachRolePolicy",  # Rollen verwalten
+          "iam:PassRole"           # Rollen weitergeben
         ],
         Resource = "*"
       }
