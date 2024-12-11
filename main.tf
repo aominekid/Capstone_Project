@@ -3,17 +3,29 @@ provider "aws" {
   region = "eu-central-1" # Region Frankfurt
 }
 
-# S3-Bucket erstellen
+# S3-Bucket
 resource "aws_s3_bucket" "foto_bucket" {
   bucket = "hochzeits-foto-bucket"
-  acl    = "public-read" # Optional: für öffentliche Leseberechtigung
+}
 
-  # Versionierung aktivieren
-  versioning {
-    enabled = true
+# ACL separat definieren
+resource "aws_s3_bucket_acl" "foto_bucket_acl" {
+  bucket = aws_s3_bucket.foto_bucket.id
+  acl    = "public-read"
+}
+
+# Versionierung separat konfigurieren
+resource "aws_s3_bucket_versioning" "foto_bucket_versioning" {
+  bucket = aws_s3_bucket.foto_bucket.id
+
+  versioning_configuration {
+    status = "Enabled"
   }
+}
 
-  # Bucket Policy hinzufügen
+# Bucket-Policy separat definieren
+resource "aws_s3_bucket_policy" "foto_bucket_policy" {
+  bucket = aws_s3_bucket.foto_bucket.id
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -81,4 +93,3 @@ resource "aws_iam_role_policy" "lambda_policy" {
     ]
   })
 }
- # test
