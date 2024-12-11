@@ -58,6 +58,12 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
+resource "aws_s3_bucket" "foto_bucket" {
+  bucket              = "hochzeits-foto-bucket-unique-eu"
+  object_lock_enabled = false # Object Lock deaktivieren
+}
+
+
 # Berechtigungen für Lambda
 resource "aws_iam_role_policy" "lambda_policy" {
   name   = "lambda_policy"
