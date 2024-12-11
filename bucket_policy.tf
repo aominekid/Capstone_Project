@@ -15,8 +15,8 @@ resource "aws_s3_bucket_policy" "foto_bucket_policy" {
         },
         Action    = "s3:*",
         Resource  = [
-          "arn:aws:s3:::hochzeits-foto-bucket",     # Zugriff auf den Bucket
-          "arn:aws:s3:::hochzeits-foto-bucket/*"   # Zugriff auf Inhalte im Bucket
+          "arn:aws:s3:::hochzeits-foto-bucket-unique-eu",     # Zugriff auf den Bucket
+          "arn:aws:s3:::hochzeits-foto-bucket-unique-eu/*"   # Zugriff auf Inhalte im Bucket
         ]
       }
     ]

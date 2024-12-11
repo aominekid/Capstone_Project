@@ -1,11 +1,11 @@
 # Provider konfigurieren
 provider "aws" {
-  region = "us-west-2" # Region Oregon
+  region = "eu-central-1" # Region Frankfurt
 }
 
 # S3-Bucket
 resource "aws_s3_bucket" "foto_bucket" {
-  bucket = "hochzeits-foto-bucket"
+  bucket = "hochzeits-foto-bucket-unique-eu" # Einzigartiger Bucket-Name
 }
 
 # ACL separat definieren
@@ -21,6 +21,23 @@ resource "aws_s3_bucket_versioning" "foto_bucket_versioning" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+# Bucket-Policy separat definieren
+resource "aws_s3_bucket_policy" "foto_bucket_policy" {
+  bucket = aws_s3_bucket.foto_bucket.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "PublicReadGetObject",
+        Effect    = "Allow",
+        Principal = "*",
+        Action    = "s3:GetObject",
+        Resource  = "arn:aws:s3:::hochzeits-foto-bucket-unique-eu/*"
+      }
+    ]
+  })
 }
 
 # Lambda-Funktion erstellen
@@ -71,7 +88,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "s3:PutObject",
           "s3:GetObject"
         ],
-        Resource = "arn:aws:s3:::hochzeits-foto-bucket/*"
+        Resource = "arn:aws:s3:::hochzeits-foto-bucket-unique-eu/*"
       }
     ]
   })
